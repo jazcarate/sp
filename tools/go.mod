@@ -1,4 +1,4 @@
-module github.com/golang-templates/seed/build
+module github.com/jazcarate/sp/build
 
 go 1.15
 
