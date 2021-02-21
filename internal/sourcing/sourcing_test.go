@@ -19,7 +19,15 @@ func TestParticipant_NilState(t *testing.T) {
 	assert.Empty(t, s.Participants())
 }
 
-func TestParticipant_AddingOne(t *testing.T) {
+func TestParticipant_AddingOneDoesNotAddItToParticipating(t *testing.T) {
+	var s *sourcing.State
+	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe"})
+
+	assert.Empty(t, err)
+	assert.Empty(t, s.Participants())
+}
+
+func TestParticipant_AddingOneAndEnabling(t *testing.T) {
 	var s *sourcing.State
 	s, err := s.Apply(sourcing.MultiOp{Ops: []sourcing.Operable{
 		sourcing.AddParticipant{Name: "Joe"},
@@ -28,6 +36,17 @@ func TestParticipant_AddingOne(t *testing.T) {
 
 	assert.Empty(t, err)
 	assert.ElementsMatch(t, [1]string{"Joe"}, s.Participants())
+}
+
+func TestParticipant_EnablingAnUnexistingErrors(t *testing.T) {
+	var s *sourcing.State
+	_, err := s.Apply(sourcing.EnabbleParticipant{Name: "Joe"})
+
+	if assert.Error(t, err) {
+		assert.Equal(t,
+			"apply <sourcing.EnabbleParticipant{Name:\"Joe\"}>: that participant does not exist",
+			err.Error())
+	}
 }
 
 func TestParticipant_AddingAndRemovingHasEmptyParticipants(t *testing.T) {
