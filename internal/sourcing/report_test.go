@@ -13,14 +13,24 @@ func TestMarkdown_NilState(t *testing.T) {
 	assert.Equal(t, "🗅 No state", s.Markdown())
 }
 
-func TestMarkdown_NewState(t *testing.T) {
-	s := sourcing.NewState()
+func TestMarkdown_HidesDisabledParticipants(t *testing.T) {
+	var s *sourcing.State
 
+	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe"})
+
+	assert.Empty(t, err)
 	assert.Equal(t, "🗅 No state", s.Markdown())
 }
 
 func TestMarkdown_WithParticipants(t *testing.T) {
-	s, _ := sourcing.NewState().Apply(sourcing.AddParticipant{Name: "Joe"})
+	var s *sourcing.State
 
+	s, err1 := s.Apply(sourcing.AddParticipant{Name: "Joe"})
+	s, err2 := s.Apply(sourcing.EnabbleParticipant{Name: "Joe"})
+	s, err3 := s.Apply(sourcing.AddParticipant{Name: "Ben"})
+
+	assert.Empty(t, err1)
+	assert.Empty(t, err2)
+	assert.Empty(t, err3)
 	assert.Equal(t, "Participating: Joe", s.Markdown())
 }

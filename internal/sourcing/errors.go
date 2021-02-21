@@ -8,7 +8,7 @@ import (
 
 // A ApplyError represents an error when applying Op to a State; defined by the inner Error.
 type ApplyError struct {
-	PreviousState State
+	PreviousState *State
 	Op            Operable
 	Err           error
 }
@@ -21,5 +21,5 @@ var (
 	// ErrAlreadyExists represents an error when trying to add a participant already in the pool.
 	ErrAlreadyExists = errors.New("participant already exists")
 	// ErrNoparticipant represents an error when trying to remove a participant that is not in the pool.
-	ErrNoparticipant = errors.New("that participant does not exist")
+	ErrNoParticipant = errors.New("that participant does not exist")
 )

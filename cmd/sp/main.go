@@ -8,32 +8,20 @@ import (
 	"github.com/jazcarate/sp/internal/sourcing"
 )
 
-func multiApply(ops []sourcing.Operable) (*sourcing.State, error) {
-	var err error
-
-	s := sourcing.NewState()
-
-	for _, op := range ops {
-		s, err = s.Apply(op)
-		if err != nil {
-			return nil, fmt.Errorf("coudn't apply: %w", err)
-		}
-	}
-
-	return &s, nil
-}
-
 const (
 	success = 0
 	failure = 1
 )
 
 func main() {
-	s, err := multiApply([]sourcing.Operable{
+	var s *sourcing.State
+
+	s, err := s.Apply(sourcing.MultiOp{Ops: []sourcing.Operable{
 		sourcing.AddParticipant{Name: "Joe"},
-		sourcing.AddParticipant{Name: "Joe"},
+		sourcing.EnabbleParticipant{Name: "Joe"},
+		sourcing.AddParticipant{Name: "Ben"},
 		sourcing.RemoveParticipant{Name: "Ben"},
-	})
+	}})
 
 	if err != nil {
 		fmt.Println(err)

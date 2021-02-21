@@ -6,15 +6,12 @@ import (
 	"strings"
 )
 
-func (s *State) isEmpty() bool {
-	return len(s.participants) == 0
-}
-
 // Markdown converts a state to a markdown report.
 func (s *State) Markdown() string {
-	if s == nil || s.isEmpty() {
+	participants := s.Participants()
+	if s == nil || len(participants) == 0 {
 		return "🗅 No state"
 	}
 
-	return fmt.Sprintf("Participating: %v", strings.Join(s.Participants(), ", "))
+	return fmt.Sprintf("Participating: %v", strings.Join(participants, ", "))
 }
