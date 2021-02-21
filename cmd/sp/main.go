@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jazcarate/sp/pkg/sourcing"
+	"github.com/jazcarate/sp/internal/sourcing"
 )
 
 func multiApply(ops []sourcing.Operable) (*sourcing.State, error) {
@@ -30,9 +30,9 @@ const (
 
 func main() {
 	s, err := multiApply([]sourcing.Operable{
-		sourcing.AddParticipant("Joe"),
-		sourcing.AddParticipant("Ben"),
-		sourcing.RemoveParticipant("Ben"),
+		sourcing.AddParticipant{Name: "Joe"},
+		sourcing.AddParticipant{Name: "Joe"},
+		sourcing.RemoveParticipant{Name: "Ben"},
 	})
 
 	if err != nil {
