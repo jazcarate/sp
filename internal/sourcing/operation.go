@@ -19,7 +19,7 @@ func (mop MultiOp) apply(s *State) (*State, error) {
 	var err error
 
 	for i, op := range mop.Ops {
-		s, err = s.Apply(op)
+		s, err = op.apply(s)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't apply operation #%v: %w", i, err)
 		}
@@ -29,17 +29,21 @@ func (mop MultiOp) apply(s *State) (*State, error) {
 }
 
 // AddParticipant Operation: Adds a new participant to the split with a default split of 0
-type AddParticipant struct{ Name string }
+type AddParticipant struct {
+	Name      string
+	PublicKey string
+}
 
 func (op AddParticipant) apply(s *State) (*State, error) {
 	needle := op.Name
-	_, err := s.findParticipant(needle)
+	_, _, err := s.findParticipant(needle)
 
 	if !errors.Is(err, ErrNoParticipant) {
 		return s, &ApplyError{PreviousState: s, Op: op, Err: ErrAlreadyExists}
 	}
 
-	s.Participants = append(s.Participants, Participant{Name: needle, Split: 0})
+	s.Participants = append(s.Participants, Participant{Name: needle, Split: 0, SplitPercentage: 0})
+	s.Balance = append(s.Balance, make([]int, 0, len(s.Participants)))
 
 	return s, nil
 }
@@ -51,26 +55,21 @@ type SplitParticipant struct {
 }
 
 func (op SplitParticipant) apply(s *State) (*State, error) {
-	p, err := s.findParticipant(op.Name)
+	p, _, err := s.findParticipant(op.Name)
 	if err != nil {
 		return nil, &ApplyError{PreviousState: s, Op: op, Err: err}
 	}
 
 	p.Split = op.NewSplit
+	s = s.readjustSplits()
 
 	return s, nil
 }
 
 // A SigningConfiguration dictates how to verify each operation.
-type SigningConfiguration string
-
-func (c SigningConfiguration) String() string {
-	return string(c)
-}
-
 const (
 	// Trust means that no signing required. Default configuration.
-	Trust SigningConfiguration = "Trust"
+	Trust string = "Trust"
 	// All means everyone has to sign off every operation.
 	All = "All"
 	// Involved menas that only parties involved need to sign.
@@ -78,9 +77,29 @@ const (
 )
 
 // Configure Operation: Changes the current trust configuration.
-type Configure struct{ NewConfig SigningConfiguration }
+type Configure struct{ NewConfig string }
 
 func (op Configure) apply(s *State) (*State, error) {
 	s.Configuration = op.NewConfig
+	return s, nil
+}
+
+// Spend Operation: Looks at the split and sucks money from everyoneo else
+type Spend struct {
+	Who    string
+	Amount int
+}
+
+func (op Spend) apply(s *State) (*State, error) {
+	_, x, err := s.findParticipant(op.Who)
+	if err != nil {
+		return nil, &ApplyError{PreviousState: s, Op: op, Err: err}
+	}
+
+	for y, _ := range s.Participants {
+		s.Balance[x][y] -= 3
+		s.Balance[y][x] += 3
+	}
+
 	return s, nil
 }

@@ -15,7 +15,7 @@ func TestParticipant_EmptyStateHasNoParticipants(t *testing.T) {
 
 func TestParticipant_AddingOneAddsItToTheList(t *testing.T) {
 	var s *sourcing.State
-	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe"})
+	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe", PublicKey: "1"})
 
 	assert.Empty(t, err)
 	assert.Len(t, s.Participants, 1)
@@ -37,8 +37,8 @@ func TestParticipantError_AddingDuplicateParticipantsErrors(t *testing.T) {
 	var s *sourcing.State
 
 	_, err := s.Apply(sourcing.MultiOp{Ops: []sourcing.StateChanger{
-		sourcing.AddParticipant{Name: "Joe"},
-		sourcing.AddParticipant{Name: "Joe"},
+		sourcing.AddParticipant{Name: "Joe", PublicKey: "1"},
+		sourcing.AddParticipant{Name: "Joe", PublicKey: "2"},
 	}})
 
 	if assert.Error(t, err) {
@@ -46,4 +46,13 @@ func TestParticipantError_AddingDuplicateParticipantsErrors(t *testing.T) {
 			"couldn't apply operation #1: apply <sourcing.AddParticipant{Name:\"Joe\"}>: participant already exists",
 			err.Error())
 	}
+}
+
+func TestParticipantBalance_AddingAParticipantStartsWithA0Balance(t *testing.T) {
+	var s *sourcing.State
+
+	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe", PublicKey: "1"})
+
+	assert.Empty(t, err)
+	assert.Empty(t, s.Balance)
 }

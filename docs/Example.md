@@ -11,9 +11,9 @@
 ## Participants
 | Name | Split | %age |
 | --- | ---: | ---: |
-| [Joaco](#joaco) | `1`| 50% |
-| [Greenderella](#greenderella) | `1`| 50% |
-| [Bob](#bob)  | `0` |
+| [Joaco](#joaco) | 1 | 50% |
+| [Greenderella](#greenderella) | 1 | 50% |
+| [Bob](#bob)  | 0 |
 
 
 ## Details

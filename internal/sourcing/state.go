@@ -1,26 +1,45 @@
 // Package sourcing contains state and ways to change it
 package sourcing
 
+import "time"
+
+// A Participant represents a participant in the split.
 type Participant struct {
-	Name  string
-	Split int
+	Name            string
+	Split           int
+	SplitPercentage int // in centiunits
+}
+
+// A LogEvent represents an event in the log.
+type LogEvent struct {
+	By        string
+	Operation StateChanger
+	On        time.Time
+	Note      string
+	Signature string
+	Valid     bool
 }
 
 // A State represents the current state.
-// TODO split inti "ministates" whith ops for each.
 type State struct {
 	Name          string
 	Participants  ([]Participant)
-	Configuration SigningConfiguration
+	Configuration string
+	Balance       [][]int
+	Log           ([]LogEvent)
+	LastOp        int
 }
 
-// NewState constructor with sensible default value
 // TODO Can we make the zero value?
+// NewState constructor with sensible default value.
 func NewState() *State {
 	return &State{
 		Name:          "Split Chain",
 		Participants:  nil,
 		Configuration: Trust,
+		Log:           nil,
+		LastOp:        -1,
+		Balance:       nil,
 	}
 }
 
@@ -30,15 +49,40 @@ func (s *State) Apply(op StateChanger) (*State, error) {
 		s = NewState()
 	}
 
+	s.Log = append(s.Log, LogEvent{
+		Operation: op,
+		On:        time.Now(),
+		Note:      "",
+		Signature: "1",     // TODO
+		By:        "joaco", // TODO
+		Valid:     true,    // TODO
+	})
+	s.LastOp++
+
 	return op.apply(s)
 }
 
-func (s *State) findParticipant(name string) (*Participant, error) {
+func (s *State) findParticipant(name string) (*Participant, int, error) {
 	for i, k := range s.Participants {
 		if k.Name == name {
-			return &s.Participants[i], nil
+			return &s.Participants[i], i, nil
 		}
 	}
 
-	return nil, ErrNoParticipant
+	return nil, -1, ErrNoParticipant
+}
+
+const percentaga = 100
+
+func (s *State) readjustSplits() *State {
+	var total int
+	for _, p := range s.Participants {
+		total += p.Split
+	}
+
+	for i, p := range s.Participants {
+		s.Participants[i].SplitPercentage = (p.Split * percentaga) / total
+	}
+
+	return s
 }
