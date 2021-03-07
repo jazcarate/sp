@@ -2,32 +2,28 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/jazcarate/sp/internal/sourcing"
 )
 
-const (
-	success = 0
-	failure = 1
-)
-
 func main() {
 	var s *sourcing.State
 
-	s, err := s.Apply(sourcing.MultiOp{Ops: []sourcing.Operable{
+	s, err := s.Apply(sourcing.MultiOp{Ops: []sourcing.StateChanger{
 		sourcing.AddParticipant{Name: "Joe"},
-		sourcing.EnabbleParticipant{Name: "Joe"},
+		sourcing.SplitParticipant{Name: "Joe", NewSplit: 1},
 		sourcing.AddParticipant{Name: "Ben"},
-		sourcing.RemoveParticipant{Name: "Ben"},
+		sourcing.SplitParticipant{Name: "Ben", NewSplit: 1},
 	}})
-
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(failure)
-	} else {
-		fmt.Println(s.Markdown())
-		os.Exit(success)
+		panic(err)
 	}
+
+	err = s.Markdown(os.Stdout)
+	if err != nil {
+		panic(err)
+	}
+
+	os.Exit(0)
 }

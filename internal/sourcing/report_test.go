@@ -1,6 +1,7 @@
 package sourcing_test
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/jazcarate/sp/internal/sourcing"
@@ -8,29 +9,21 @@ import (
 )
 
 func TestMarkdown_NilState(t *testing.T) {
-	var s *sourcing.State
+	var (
+		s *sourcing.State
+		b bytes.Buffer
+	)
 
-	assert.Equal(t, "🗅 No state", s.Markdown())
-}
-
-func TestMarkdown_HidesDisabledParticipants(t *testing.T) {
-	var s *sourcing.State
-
-	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe"})
+	err := s.Markdown(&b)
 
 	assert.Empty(t, err)
-	assert.Equal(t, "🗅 No state", s.Markdown())
-}
-
-func TestMarkdown_WithParticipants(t *testing.T) {
-	var s *sourcing.State
-
-	s, err1 := s.Apply(sourcing.AddParticipant{Name: "Joe"})
-	s, err2 := s.Apply(sourcing.EnabbleParticipant{Name: "Joe"})
-	s, err3 := s.Apply(sourcing.AddParticipant{Name: "Ben"})
-
-	assert.Empty(t, err1)
-	assert.Empty(t, err2)
-	assert.Empty(t, err3)
-	assert.Equal(t, "Participating: Joe", s.Markdown())
+	assert.Equal(t, "# Split Chain\n\n"+
+		"🗅 Starting out a new Split Chain and don't know \"what now?\".\n\n"+
+		"No problem! Check the [docs](https://github.com/jazcarate/sp/blob/master/docs/new_sp_now_what.md)\n\n"+
+		"## Operations\n"+
+		"Current trust configuration: **Trust** [(ℹ)]"+
+		"(https://github.com/jazcarate/sp/blob/master/docs/understanding_a_report.md.md#trust)\n\n"+
+		"### Log\n"+
+		"🌈 Fresh new 🌈\n",
+		b.String())
 }

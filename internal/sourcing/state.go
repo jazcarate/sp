@@ -1,46 +1,42 @@
 // Package sourcing contains state and ways to change it
 package sourcing
 
-type participant struct {
-	name    string
-	enabled bool
-	split   *int
+type Participant struct {
+	Name  string
+	Split int
 }
 
 // A State represents the current state.
+// TODO split inti "ministates" whith ops for each.
 type State struct {
-	participants ([]participant)
+	Name          string
+	Participants  ([]Participant)
+	Configuration SigningConfiguration
 }
 
-// Participants returns current participant slice from a state.
-func (s *State) Participants() []string {
-	if s == nil {
-		return nil
+// NewState constructor with sensible default value
+// TODO Can we make the zero value?
+func NewState() *State {
+	return &State{
+		Name:          "Split Chain",
+		Participants:  nil,
+		Configuration: Trust,
 	}
-
-	participants := make([]string, 0, len(s.participants))
-	for _, k := range s.participants {
-		if k.enabled {
-			participants = append(participants, k.name)
-		}
-	}
-
-	return participants
 }
 
 // Apply an operation to a state.
-func (s *State) Apply(op Operable) (*State, error) {
+func (s *State) Apply(op StateChanger) (*State, error) {
 	if s == nil {
-		s = &State{}
+		s = NewState()
 	}
 
 	return op.apply(s)
 }
 
-func (s *State) findParticipant(name string) (*participant, error) {
-	for i, k := range s.participants {
-		if k.name == name {
-			return &s.participants[i], nil
+func (s *State) findParticipant(name string) (*Participant, error) {
+	for i, k := range s.Participants {
+		if k.Name == name {
+			return &s.Participants[i], nil
 		}
 	}
 

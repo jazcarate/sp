@@ -6,14 +6,14 @@ import (
 	"fmt"
 )
 
-// An Operable represents a change to the state.
-type Operable interface {
+// StateChanger represents one of the operations that can modify the state.
+type StateChanger interface {
 	apply(*State) (*State, error)
 }
 
 // MultiOp Operation: Bundles multiple operations in secuence.
 // First error halts the whole operation.
-type MultiOp struct{ Ops []Operable }
+type MultiOp struct{ Ops []StateChanger }
 
 func (mop MultiOp) apply(s *State) (*State, error) {
 	var err error
@@ -28,7 +28,7 @@ func (mop MultiOp) apply(s *State) (*State, error) {
 	return s, nil
 }
 
-// AddParticipant Operation: Adds a new participant to the split.
+// AddParticipant Operation: Adds a new participant to the split with a default split of 0
 type AddParticipant struct{ Name string }
 
 func (op AddParticipant) apply(s *State) (*State, error) {
@@ -39,35 +39,48 @@ func (op AddParticipant) apply(s *State) (*State, error) {
 		return s, &ApplyError{PreviousState: s, Op: op, Err: ErrAlreadyExists}
 	}
 
-	s.participants = append(s.participants, participant{name: needle, enabled: false, split: nil})
+	s.Participants = append(s.Participants, Participant{Name: needle, Split: 0})
 
 	return s, nil
 }
 
-// EnabbleParticipant Operation: Enables an existing participant to be part of the split.
-type EnabbleParticipant struct{ Name string }
+// SplitParticipant Operation: Changes the split of a participant.
+type SplitParticipant struct {
+	Name     string
+	NewSplit int
+}
 
-func (op EnabbleParticipant) apply(s *State) (*State, error) {
+func (op SplitParticipant) apply(s *State) (*State, error) {
 	p, err := s.findParticipant(op.Name)
 	if err != nil {
 		return nil, &ApplyError{PreviousState: s, Op: op, Err: err}
 	}
 
-	p.enabled = true
+	p.Split = op.NewSplit
 
 	return s, nil
 }
 
-// RemoveParticipant Operation: Removes a new participant to the split.
-type RemoveParticipant struct{ Name string }
+// A SigningConfiguration dictates how to verify each operation.
+type SigningConfiguration string
 
-func (op RemoveParticipant) apply(s *State) (*State, error) {
-	p, err := s.findParticipant(op.Name)
-	if err != nil {
-		return nil, &ApplyError{PreviousState: s, Op: op, Err: err}
-	}
+func (c SigningConfiguration) String() string {
+	return string(c)
+}
 
-	p.enabled = false
+const (
+	// Trust means that no signing required. Default configuration.
+	Trust SigningConfiguration = "Trust"
+	// All means everyone has to sign off every operation.
+	All = "All"
+	// Involved menas that only parties involved need to sign.
+	Involved = "Involved"
+)
 
+// Configure Operation: Changes the current trust configuration.
+type Configure struct{ NewConfig SigningConfiguration }
+
+func (op Configure) apply(s *State) (*State, error) {
+	s.Configuration = op.NewConfig
 	return s, nil
 }
