@@ -108,6 +108,17 @@ func TestMatrix_IncreaseSizeKeepsValues(t *testing.T) {
 	assetGet(t, m, 0, 3, 0)
 }
 
+func TestMatrix_Modify(t *testing.T) {
+	var m *trianglem.M
+	m = m.IncrD(2)
+
+	_ = m.Set(0, 1, 10)
+	err := m.Modify(0, 1, func(i int) int { return i * 2 })
+
+	assert.Empty(t, err)
+	assetGet(t, m, 10*2, 0, 1)
+}
+
 func assetGet(t *testing.T, m *trianglem.M, val, x, y int) {
 	v, err := m.Get(x, y)
 

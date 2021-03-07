@@ -47,6 +47,8 @@ func toOpMarkdown(op StateChanger) string {
 		return fmt.Sprintf("🪓 Split %s for `%d`", participant(e.Name), e.NewSplit)
 	case Configure:
 		return fmt.Sprintf("💻 Configure to `%s`", e.NewConfig)
+	case Spend:
+		return fmt.Sprintf("💸 %s **spent $%d**", participant(e.Who), e.Amount)
 	case MultiOp:
 		var result string
 		for _, o := range e.Ops {
@@ -55,7 +57,7 @@ func toOpMarkdown(op StateChanger) string {
 
 		return result
 	default:
-		panic(fmt.Sprint("Unknown event type", e))
+		panic(fmt.Sprint("Unknown event type", op))
 	}
 }
 
@@ -70,8 +72,20 @@ func toTime(t time.Time) string {
 // Markdown converts a state to a markdown report.
 func (s *State) Markdown(wr io.Writer) error {
 	glance := func(x int, y int) string {
-		p := s.Balance[x][y]
-		return fmt.Sprint(p)
+		p, err := s.Balance.Get(x, y)
+		if err != nil {
+			panic(fmt.Sprintf("can't get the participant at (%d, %d)", x, y))
+		}
+
+		if p == 0 {
+			return ""
+		}
+
+		if p < 0 {
+			return fmt.Sprint("$", -p, "◀")
+		}
+
+		return fmt.Sprint("$", p, "🔼")
 	}
 
 	funcMap := template.FuncMap{

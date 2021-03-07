@@ -1,7 +1,11 @@
 // Package sourcing contains state and ways to change it
 package sourcing
 
-import "time"
+import (
+	"time"
+
+	"github.com/jazcarate/sp/internal/trianglem"
+)
 
 // A Participant represents a participant in the split.
 type Participant struct {
@@ -25,7 +29,7 @@ type State struct {
 	Name          string
 	Participants  ([]Participant)
 	Configuration string
-	Balance       [][]int
+	Balance       *trianglem.M
 	Log           ([]LogEvent)
 	LastOp        int
 }

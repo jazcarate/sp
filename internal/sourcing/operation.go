@@ -43,7 +43,7 @@ func (op AddParticipant) apply(s *State) (*State, error) {
 	}
 
 	s.Participants = append(s.Participants, Participant{Name: needle, Split: 0, SplitPercentage: 0})
-	s.Balance = append(s.Balance, make([]int, 0, len(s.Participants)))
+	s.Balance = s.Balance.Incr()
 
 	return s, nil
 }
@@ -97,8 +97,7 @@ func (op Spend) apply(s *State) (*State, error) {
 	}
 
 	for y, _ := range s.Participants {
-		s.Balance[x][y] -= 3
-		s.Balance[y][x] += 3
+		s.Balance.Modify(x, y, func(x int) int { return x - 3 })
 	}
 
 	return s, nil

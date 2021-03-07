@@ -1,23 +1,23 @@
-// Package M represent a triangle matrix where one side is the inverse of the other
-// Useful for tracking balances.
+// Package trianglem represent a triangle matrix where one side is the inverse of the other
 package trianglem
 
 import (
 	"errors"
 )
 
+// M represents a triangle matrix.
 /*
-This represents a triangle matrix where:
+Some optimizations hold where:
  1  2  3  4 		1=6=11=16= 🤷‍♂️
  5  6  7  8			2 = -5		7 = -10
  9 10 11 12			3 = -9		8 = -11
 13 14 15 16			4 = -13		12 = -15
 
 As we can represent the matrix with only half the values, the memory representation is:
-data: 4 3 8 2 7 12
+data: 2 3 7 4 8 12
 size: 4
 
-This might look convoluted, bt we are going from top left, in a ↘ diagonal.
+This might look convoluted, but we are basically incrementig the matirx by adding a (size-1) column.
 */
 type M struct {
 	data []int
@@ -26,6 +26,7 @@ type M struct {
 
 const def int = 0
 
+// Get the value at position (x,y).
 func (t *M) Get(x, y int) (int, error) {
 	if t == nil {
 		return -1, ErrOutOfBoundsMatrix
@@ -44,7 +45,7 @@ func (t *M) Get(x, y int) (int, error) {
 		return -val, err
 	}
 
-	return t.data[toDiagCoordinates(x, y, t.size)], nil
+	return t.data[toDiagCoordinates(x, y)], nil
 }
 
 var (
@@ -54,6 +55,7 @@ var (
 	ErrCantSetDiagonal = errors.New("can't do operations on the diagonal")
 )
 
+// Set the value at position (x,y).
 func (t *M) Set(x, y, val int) error {
 	if t == nil {
 		return ErrOutOfBoundsMatrix
@@ -67,15 +69,27 @@ func (t *M) Set(x, y, val int) error {
 		return t.Set(y, x, -val)
 	}
 
-	t.data[toDiagCoordinates(x, y, t.size)] = val
+	t.data[toDiagCoordinates(x, y)] = val
 
 	return nil
 }
 
+// Modify the value at position (x,y) by a given function.
+func (t *M) Modify(x, y int, mod func(int) int) error {
+	val, err := t.Get(x, y)
+	if err != nil {
+		return err
+	}
+
+	return t.Set(x, y, mod(val))
+}
+
+// Incr the underlying storage by 1.
 func (t *M) Incr() *M {
 	return t.IncrD(1)
 }
 
+// IncrD the underlying storage by any size.
 func (t *M) IncrD(delta int) *M {
 	newSize := delta
 
@@ -95,13 +109,11 @@ func (t *M) IncrD(delta int) *M {
 func realSize(size int) int {
 	// Half of ( Area of a square - Diagonal )
 	// (x² - x) / 2
-	return (size*size - size) / 2
+	return (size*size - size) >> 1
 }
 
-func toDiagCoordinates(x, y, size int) int {
-	invX := size - x - 1
-
-	return t(y+1) + t(invX) - t(y-1) - 1
+func toDiagCoordinates(x, y int) int {
+	return t(x-1) + y
 }
 
 func t(n int) int {
