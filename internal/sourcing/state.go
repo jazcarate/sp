@@ -10,6 +10,7 @@ import (
 // A Participant represents a participant in the split.
 type Participant struct {
 	Name            string
+	PublicKey       string
 	Split           int
 	SplitPercentage int // in centiunits
 }

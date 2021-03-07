@@ -119,6 +119,25 @@ func TestMatrix_Modify(t *testing.T) {
 	assetGet(t, m, 10*2, 0, 1)
 }
 
+func TestMatrix_IterateEmpty(t *testing.T) {
+	var m *trianglem.M
+
+	val := m.Iterate(3)
+
+	assert.Empty(t, val)
+}
+
+func TestMatrix_IterateWithValues(t *testing.T) {
+	var m *trianglem.M
+	m = m.IncrD(2)
+
+	_ = m.Set(1, 0, 10)
+
+	val := m.Iterate(1)
+
+	assert.Equal(t, []int{10, 0}, val)
+}
+
 func assetGet(t *testing.T, m *trianglem.M, val, x, y int) {
 	v, err := m.Get(x, y)
 

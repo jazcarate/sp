@@ -20,7 +20,13 @@ const markdownTemplate string = `# {{ .Name }}{{ $st := . }}
 | Name | Split | %age |
 | --- | ---: | ---: |{{ range .Participants }}
 | [{{ .Name }}]({{ .Name | ToMarkdownAnchor }}) | {{ .Split }} | {{ .SplitPercentage }}% |{{ end }}
-{{ else }}
+
+## Details
+{{ range $i, $ := .Participants }}
+### {{ .Name }}
+<!-- Public key: {{ .PublicKey }} -->
+You currently split the expenditures at **{{ .SplitPercentage }}%**.
+{{ range $ip, $val := $st.Balance.Iterate $i }}{{ BalanceDetail $ip $val }}{{ end }}{{ end }}{{ else }}
 🗅 Starting out a new Split Chain and don't know "what now?".
 
 No problem! Check the [docs](https://github.com/jazcarate/sp/blob/master/docs/new_sp_now_what.md)
@@ -88,11 +94,26 @@ func (s *State) Markdown(wr io.Writer) error {
 		return fmt.Sprint("$", p, "🔼")
 	}
 
+	balanceDetail := func(pIndex int, i int) string {
+		p := s.Participants[pIndex]
+
+		if i == 0 {
+			return ""
+		}
+
+		if i > 0 {
+			return fmt.Sprintf("- You **owe $%d** to %v\n", i, participant(p.Name))
+		}
+
+		return fmt.Sprintf("- You are **owed $%d** from %v\n", -i, participant(p.Name))
+	}
+
 	funcMap := template.FuncMap{
 		"ToMarkdownAnchor": toMarkdownAnchor,
 		"ToOpMarkdown":     toOpMarkdown,
 		"ToTime":           toTime,
 		"Glance":           glance,
+		"BalanceDetail":    balanceDetail,
 	}
 
 	if s == nil {

@@ -48,6 +48,26 @@ func (t *M) Get(x, y int) (int, error) {
 	return t.data[toDiagCoordinates(x, y)], nil
 }
 
+// Iterate over a column.
+func (t *M) Iterate(col int) []int {
+	if t == nil {
+		return nil
+	}
+
+	ret := make([]int, t.size)
+
+	for y := 0; y < t.size; y++ {
+		var err error
+		ret[y], err = t.Get(col, y)
+
+		if err != nil {
+			panic("should be able to get the whole column")
+		}
+	}
+
+	return ret
+}
+
 var (
 	// ErrOutOfBoundsMatrix represents an error when trying to set outside bounds.
 	ErrOutOfBoundsMatrix = errors.New("can't set on an empty matrix")

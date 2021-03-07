@@ -28,7 +28,7 @@ func (mop MultiOp) apply(s *State) (*State, error) {
 	return s, nil
 }
 
-// AddParticipant Operation: Adds a new participant to the split with a default split of 0
+// AddParticipant Operation: Adds a new participant to the split with a default split of 0.
 type AddParticipant struct {
 	Name      string
 	PublicKey string
@@ -42,7 +42,12 @@ func (op AddParticipant) apply(s *State) (*State, error) {
 		return s, &ApplyError{PreviousState: s, Op: op, Err: ErrAlreadyExists}
 	}
 
-	s.Participants = append(s.Participants, Participant{Name: needle, Split: 0, SplitPercentage: 0})
+	s.Participants = append(s.Participants, Participant{
+		Name:            needle,
+		PublicKey:       op.PublicKey,
+		Split:           0,
+		SplitPercentage: 0,
+	})
 	s.Balance = s.Balance.Incr()
 
 	return s, nil
@@ -84,7 +89,7 @@ func (op Configure) apply(s *State) (*State, error) {
 	return s, nil
 }
 
-// Spend Operation: Looks at the split and sucks money from everyoneo else
+// Spend Operation: Looks at the split and sucks money from everyoneo else.
 type Spend struct {
 	Who    string
 	Amount int
@@ -96,8 +101,17 @@ func (op Spend) apply(s *State) (*State, error) {
 		return nil, &ApplyError{PreviousState: s, Op: op, Err: err}
 	}
 
-	for y, _ := range s.Participants {
-		s.Balance.Modify(x, y, func(x int) int { return x - 3 })
+	for y, p := range s.Participants {
+		p1 := p
+
+		if x == y {
+			continue
+		}
+
+		err = s.Balance.Modify(x, y, func(x int) int { return x - (op.Amount * p1.SplitPercentage / 100) })
+		if err != nil {
+			return s, fmt.Errorf("couldn't modify (%d, %d): %w", x, y, err)
+		}
 	}
 
 	return s, nil
