@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/jazcarate/sp/internal/sourcing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/jazcarate/sp/internal/sourcing"
 )
 
 func TestMarkdown_NilState(t *testing.T) {

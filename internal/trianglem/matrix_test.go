@@ -3,8 +3,9 @@ package trianglem_test
 import (
 	"testing"
 
-	"github.com/jazcarate/sp/internal/trianglem"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/jazcarate/sp/internal/trianglem"
 )
 
 func TestMatrix_NilValueGet(t *testing.T) {

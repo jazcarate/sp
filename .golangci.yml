@@ -13,6 +13,10 @@ linters-settings:
     require-explanation: true # require an explanation for nolint directives
     require-specific: false # don't require nolint directives to be specific about which linter is being skipped
 
+run:
+  skip-dirs:
+    - playground
+
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
@@ -50,12 +54,10 @@ linters:
     - gofumpt
     - goimports
     - golint
-    - gomnd
     - gomodguard
     - goprintffuncname
     - gosec
     - interfacer
-    - lll
     - maligned
     - misspell
     - nakedret
@@ -78,6 +80,8 @@ linters:
     # don't enable:
     # - go-header
     # - testpackage
+    # - gomnd
+    # - lll
 
 issues:
   # enable issues excluded by default 

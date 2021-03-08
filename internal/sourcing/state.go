@@ -35,8 +35,8 @@ type State struct {
 	LastOp        int
 }
 
-// TODO Can we make the zero value?
 // NewState constructor with sensible default value.
+// https://github.com/jazcarate/sp/issues/7
 func NewState() *State {
 	return &State{
 		Name:          "Split Chain",
@@ -58,9 +58,9 @@ func (s *State) Apply(op StateChanger) (*State, error) {
 		Operation: op,
 		On:        time.Now(),
 		Note:      "",
-		Signature: "1",     // TODO
-		By:        "joaco", // TODO
-		Valid:     true,    // TODO
+		Signature: "1",
+		By:        "joaco",
+		Valid:     true,
 	})
 	s.LastOp++
 

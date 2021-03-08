@@ -5,9 +5,17 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/jazcarate/sp/internal/sourcing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/jazcarate/sp/internal/sourcing"
 )
+
+func TestIntegration_WithACOnfiguration(t *testing.T) {
+	md, err := do("configure: All")
+
+	assert.Empty(t, err)
+	assert.Regexp(t, "^# Split Chain", md)
+}
 
 func TestIntegration_linksToDocWhenNewSP(t *testing.T) {
 	var (
@@ -18,7 +26,6 @@ func TestIntegration_linksToDocWhenNewSP(t *testing.T) {
 	err := s.Markdown(&b)
 
 	assert.Empty(t, err)
-	assert.Equal(t, "^# Split Chain", b.String())
 	assert.Regexp(t, "^# Split Chain", b.String())
 }
 

@@ -34,11 +34,11 @@ No problem! Check the [docs](https://github.com/jazcarate/sp/blob/master/docs/ne
 ## Operations
 Current trust configuration: **{{ .Configuration }}** [(ℹ)](https://github.com/jazcarate/sp/blob/master/docs/understanding_a_report.md.md{{ .Configuration | ToMarkdownAnchor }})
 
-### Log [(go to the last ⬇)](#op-{{ .LastOp }})
-{{if .Log}}| # |  Operation | On | Note | Status |
+### Log{{if .Log}} [(go to the last ⬇)](#op-{{ .LastOp }})
+| # |  Operation | On | Note | Status |
 | ---: | --- | --- | --- | ---: |{{ range $i, $op := .Log }}
-| [{{ $i }}](#op-{{ $i }})<a id="op-{{ $i }}"></a> | {{ $op.Operation | ToOpMarkdown }}<!-- Sign &{{ $op.By}} {{ $op.Signature }}-->  | {{ $op.On | ToTime }} | {{ $op.Note }} | {{if $op.Valid }}✅{{ else }}❓{{ end }} |{{ else }}
-🌈 Fresh new 🌈{{ end }}{{ end }}
+| [{{ $i }}](#op-{{ $i }})<a id="op-{{ $i }}"></a> | {{ $op.Operation | ToOpMarkdown }}<!-- Sign &{{ $op.By}} {{ $op.Signature }}-->  | {{ $op.On | ToTime }} | {{ $op.Note }} | {{if $op.Valid }}✅{{ else }}❓{{ end }} |{{ end }}{{ else }}
+🌈 Fresh new 🌈{{ end }}
 `
 
 func participant(name string) string {

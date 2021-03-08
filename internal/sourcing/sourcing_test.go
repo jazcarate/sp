@@ -3,8 +3,9 @@ package sourcing_test
 import (
 	"testing"
 
-	"github.com/jazcarate/sp/internal/sourcing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/jazcarate/sp/internal/sourcing"
 )
 
 func TestParticipant_EmptyStateHasNoParticipants(t *testing.T) {
@@ -43,7 +44,7 @@ func TestParticipantError_AddingDuplicateParticipantsErrors(t *testing.T) {
 
 	if assert.Error(t, err) {
 		assert.Equal(t,
-			"couldn't apply operation #1: apply <sourcing.AddParticipant{Name:\"Joe\"}>: participant already exists",
+			"couldn't apply operation #1: apply <sourcing.AddParticipant{Name:\"Joe\", PublicKey:\"2\"}>: participant already exists",
 			err.Error())
 	}
 }
@@ -52,7 +53,9 @@ func TestParticipantBalance_AddingAParticipantStartsWithA0Balance(t *testing.T) 
 	var s *sourcing.State
 
 	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe", PublicKey: "1"})
+	val, getErr := s.Balance.Get(0, 0)
 
 	assert.Empty(t, err)
-	assert.Empty(t, s.Balance)
+	assert.Empty(t, getErr)
+	assert.Empty(t, val)
 }
