@@ -55,6 +55,8 @@ func toOpMarkdown(op StateChanger) string {
 		return fmt.Sprintf("💻 Configure to `%s`", e.NewConfig)
 	case Spend:
 		return fmt.Sprintf("💸 %s **spent $%d**", participant(e.Who), e.Amount)
+	case Transfer:
+		return fmt.Sprintf("📩 %s **transferred $%d** to %s", participant(e.From), e.Amount, participant(e.To))
 	case MultiOp:
 		var result string
 		for _, o := range e.Ops {

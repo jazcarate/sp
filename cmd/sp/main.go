@@ -25,7 +25,7 @@ func main() {
 		panic(err)
 	}
 
-	s, err = s.Apply(sourcing.Spend{Who: "Joe", Amount: 10})
+	s, err = s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
 	if err != nil {
 		panic(err)
 	}

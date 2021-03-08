@@ -59,3 +59,44 @@ func TestParticipantBalance_AddingAParticipantStartsWithA0Balance(t *testing.T) 
 	assert.Empty(t, getErr)
 	assert.Empty(t, val)
 }
+
+func TestTransfer_ErrorWhenParticipantDoesNotExistTo(t *testing.T) {
+	var s *sourcing.State
+	s, _ = s.Apply(sourcing.AddParticipant{Name: "Joe", PublicKey: "1"})
+
+	_, err := s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
+
+	if assert.Error(t, err) {
+		assert.Equal(t,
+			"apply <sourcing.Transfer{From:\"Joe\", To:\"Ben\", Amount:10}>: transfer to: that participant does not exist",
+			err.Error())
+	}
+}
+
+func TestTransfer_ErrorWhenParticipantDoesNotExistFrom(t *testing.T) {
+	var s *sourcing.State
+
+	_, err := s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
+
+	if assert.Error(t, err) {
+		assert.Equal(t,
+			"apply <sourcing.Transfer{From:\"Joe\", To:\"Ben\", Amount:10}>: transfer from: that participant does not exist",
+			err.Error())
+	}
+}
+
+func TestTransfer_ChangesBalance(t *testing.T) {
+	var s *sourcing.State
+
+	s, _ = s.Apply(sourcing.MultiOp{Ops: []sourcing.StateChanger{
+		sourcing.AddParticipant{Name: "Joe", PublicKey: "1"},
+		sourcing.AddParticipant{Name: "Ben", PublicKey: "2"},
+	}})
+
+	s, err := s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
+	val, errGet := s.Balance.Get(1, 0)
+
+	assert.Empty(t, err)
+	assert.Empty(t, errGet)
+	assert.Equal(t, 10, val)
+}

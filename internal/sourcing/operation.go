@@ -71,6 +71,33 @@ func (op SplitParticipant) apply(s *State) (*State, error) {
 	return s, nil
 }
 
+// Transfer Operation: Moves money around.
+type Transfer struct {
+	From   string
+	To     string
+	Amount int
+}
+
+func (op Transfer) apply(s *State) (*State, error) {
+	_, fromI, errF := s.findParticipant(op.From)
+	_, toI, errT := s.findParticipant(op.To)
+
+	if errF != nil {
+		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer from: %w", errF)}
+	}
+
+	if errT != nil {
+		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer to: %w", errT)}
+	}
+
+	err := s.Balance.Modify(fromI, toI, func(i int) int { return i - op.Amount })
+	if err != nil {
+		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer balance modification: %w", errT)}
+	}
+
+	return s, nil
+}
+
 // A SigningConfiguration dictates how to verify each operation.
 const (
 	// Trust means that no signing required. Default configuration.
