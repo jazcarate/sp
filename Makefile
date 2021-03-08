@@ -2,7 +2,7 @@
 
 .PHONY: dev
 dev: ## dev build
-dev: clean install generate build fmt lint test build-snapshot 
+dev: clean install generate build fmt lint test mod-tidy build-snapshot 
 
 .PHONY: ci
 ci: ## CI build
