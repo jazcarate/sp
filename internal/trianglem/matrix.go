@@ -3,6 +3,7 @@ package trianglem
 
 import (
 	"errors"
+	"fmt"
 )
 
 // M represents a triangle matrix.
@@ -27,25 +28,20 @@ type M struct {
 const def int = 0
 
 // Get the value at position (x,y).
-func (t *M) Get(x, y int) (int, error) {
-	if t == nil {
-		return -1, ErrOutOfBoundsMatrix
+func (t *M) Get(x, y int) int {
+	if t == nil || x > t.size || y > t.size {
+		panic("Out of bounds")
 	}
 
 	if x == y {
-		return def, nil
-	}
-
-	if x > t.size || y > t.size {
-		return -1, ErrOutOfBoundsMatrix
+		return def
 	}
 
 	if x < y {
-		val, err := t.Get(y, x)
-		return -val, err
+		return -t.Get(y, x)
 	}
 
-	return t.data[toDiagCoordinates(x, y)], nil
+	return t.data[toDiagCoordinates(x, y)]
 }
 
 // Iterate over a column.
@@ -57,12 +53,7 @@ func (t *M) Iterate(col int) []int {
 	ret := make([]int, t.size)
 
 	for y := 0; y < t.size; y++ {
-		var err error
-		ret[y], err = t.Get(col, y)
-
-		if err != nil {
-			panic("should be able to get the whole column")
-		}
+		ret[y] = t.Get(col, y)
 	}
 
 	return ret
@@ -96,12 +87,27 @@ func (t *M) Set(x, y, val int) error {
 
 // Modify the value at position (x,y) by a given function.
 func (t *M) Modify(x, y int, mod func(int) int) error {
-	val, err := t.Get(x, y)
-	if err != nil {
-		return err
+	return t.Set(x, y, mod(t.Get(x, y)))
+}
+
+// String pretty print the matrix.
+func (t *M) String() string {
+	if t == nil {
+		return "||"
 	}
 
-	return t.Set(x, y, mod(val))
+	ret := ""
+
+	for col := 0; col < t.size; col++ {
+		ret += "|"
+		for _, v := range t.Iterate(col) {
+			ret += fmt.Sprintf("|%4d", v)
+		}
+
+		ret += "||\n"
+	}
+
+	return ret
 }
 
 // Incr the underlying storage by 1.

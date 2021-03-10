@@ -30,6 +30,11 @@ func main() {
 		panic(err)
 	}
 
+	s, err = s.Apply(sourcing.Transfer{From: "Ben", To: "Jerry", Amount: 10})
+	if err != nil {
+		panic(err)
+	}
+
 	err = s.Markdown(os.Stdout)
 	if err != nil {
 		panic(err)

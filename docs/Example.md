@@ -3,9 +3,9 @@
 ## At a glance [(ℹ)]((https://github.com/jazcarate/sp/blob/master/docs/understanding_a_report.md.md#at-a-glance))
 | | [Joaco](#joaco) | [Greenderella](#greenderella) | [Bob](#bob) |
 | --- | ---: | ---: | ---: |
-| [Joaco](#joaco) | | $5 🔼 | $7 ◀ |
-| [Greenderella](#greenderella) | $5 ◀ |  | $10 ◀ |
-| [Bob](#bob)  | $7 🔼 | $10 🔼 |  |
+| [Joaco](#joaco) | | $5 ↗ | $7 ↙ |
+| [Greenderella](#greenderella) | $5 ↙ |  | $10 ↙ |
+| [Bob](#bob)  | $7 ↗ | $10 ↗ |  |
 
 
 ## Participants

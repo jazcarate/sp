@@ -11,11 +11,7 @@ import (
 func TestMatrix_NilValueGet(t *testing.T) {
 	var m *trianglem.M
 
-	_, err := m.Get(3, 2)
-
-	if assert.Error(t, err) {
-		assert.Equal(t, trianglem.ErrOutOfBoundsMatrix, err)
-	}
+	assert.Panics(t, func() { m.Get(3, 2) }, "The code did not panic")
 }
 
 func TestMatrix_NilValueSet(t *testing.T) {
@@ -32,11 +28,7 @@ func TestMatrix_OutOfBounds(t *testing.T) {
 	var m *trianglem.M
 	m = m.Incr()
 
-	_, err := m.Get(3, 2)
-
-	if assert.Error(t, err) {
-		assert.Equal(t, trianglem.ErrOutOfBoundsMatrix, err)
-	}
+	assert.Panics(t, func() { m.Get(3, 2) }, "The code did not panic")
 }
 
 func TestMatrix_1x1(t *testing.T) {
@@ -54,9 +46,8 @@ func TestMatrix_IncreaseSize(t *testing.T) {
 	var m *trianglem.M
 	m = m.Incr()
 
-	v, err := m.Get(0, 0)
+	v := m.Get(0, 0)
 
-	assert.Empty(t, err)
 	assert.Empty(t, v)
 }
 
@@ -139,9 +130,19 @@ func TestMatrix_IterateWithValues(t *testing.T) {
 	assert.Equal(t, []int{10, 0}, val)
 }
 
-func assetGet(t *testing.T, m *trianglem.M, val, x, y int) {
-	v, err := m.Get(x, y)
+func TestMatrix_PreatyPrint(t *testing.T) {
+	var m *trianglem.M
+	m = m.IncrD(3)
 
-	assert.Empty(t, err)
+	_ = m.Set(0, 1, 10)
+	_ = m.Set(2, 0, -11)
+	_ = m.Set(1, 2, 12)
+
+	assert.Equal(t, "||   0|  10|  11||\n|| -10|   0|  12||\n|| -11| -12|   0||\n", m.String())
+}
+
+func assetGet(t *testing.T, m *trianglem.M, val, x, y int) {
+	v := m.Get(x, y)
+
 	assert.Equal(t, val, v)
 }

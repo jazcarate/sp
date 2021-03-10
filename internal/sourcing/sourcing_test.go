@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/jazcarate/sp/internal/sourcing"
+	"github.com/jazcarate/sp/internal/trianglem"
 )
 
 func TestParticipant_EmptyStateHasNoParticipants(t *testing.T) {
@@ -53,10 +54,9 @@ func TestParticipantBalance_AddingAParticipantStartsWithA0Balance(t *testing.T) 
 	var s *sourcing.State
 
 	s, err := s.Apply(sourcing.AddParticipant{Name: "Joe", PublicKey: "1"})
-	val, getErr := s.Balance.Get(0, 0)
+	val := s.Balance.Get(0, 0)
 
 	assert.Empty(t, err)
-	assert.Empty(t, getErr)
 	assert.Empty(t, val)
 }
 
@@ -94,9 +94,79 @@ func TestTransfer_ChangesBalance(t *testing.T) {
 	}})
 
 	s, err := s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
-	val, errGet := s.Balance.Get(1, 0)
+	val := s.Balance.Get(1, 0)
 
 	assert.Empty(t, err)
-	assert.Empty(t, errGet)
 	assert.Equal(t, 10, val)
+}
+
+func TestTransfer_TransferBack(t *testing.T) {
+	var s *sourcing.State
+
+	s, _ = s.Apply(sourcing.MultiOp{Ops: []sourcing.StateChanger{
+		sourcing.AddParticipant{Name: "Joe", PublicKey: "1"},
+		sourcing.AddParticipant{Name: "Ben", PublicKey: "2"},
+	}})
+
+	s, _ = s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
+	s, err := s.Apply(sourcing.Transfer{From: "Ben", To: "Joe", Amount: 10})
+	val := s.Balance.Get(1, 0)
+
+	assert.Empty(t, err)
+	assert.Equal(t, 0, val)
+}
+
+func TestTransfer_TransitiveBalance(t *testing.T) {
+	var s *sourcing.State
+
+	s, _ = s.Apply(sourcing.MultiOp{Ops: []sourcing.StateChanger{
+		sourcing.AddParticipant{Name: "Joe", PublicKey: "1"},
+		sourcing.AddParticipant{Name: "Ben", PublicKey: "2"},
+		sourcing.AddParticipant{Name: "Bob", PublicKey: "3"},
+	}})
+
+	const (
+		joe = iota
+		ben
+		bob
+	)
+
+	s, _ = s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
+	s, _ = s.Apply(sourcing.Transfer{From: "Bob", To: "Joe", Amount: 7})
+
+	assertBalance(t, s.Balance, 7, ben, bob)
+	assertBalance(t, s.Balance, 3, ben, joe)
+	assertBalance(t, s.Balance, 0, bob, joe)
+}
+
+func TestTransfer_TransitiveBalancePartial(t *testing.T) {
+	t.Skip("Algorithm is not correctly implemented")
+
+	var s *sourcing.State
+
+	s, _ = s.Apply(sourcing.MultiOp{Ops: []sourcing.StateChanger{
+		sourcing.AddParticipant{Name: "Joe", PublicKey: "1"},
+		sourcing.AddParticipant{Name: "Ben", PublicKey: "2"},
+		sourcing.AddParticipant{Name: "Bob", PublicKey: "3"},
+	}})
+
+	const (
+		joe = iota
+		ben
+		bob
+	)
+
+	s, _ = s.Apply(sourcing.Transfer{From: "Bob", To: "Joe", Amount: 7})
+	s, _ = s.Apply(sourcing.Transfer{From: "Ben", To: "Joe", Amount: 6})
+	s, _ = s.Apply(sourcing.Transfer{From: "Joe", To: "Ben", Amount: 10})
+
+	assertBalance(t, s.Balance, 4, ben, bob)
+	assertBalance(t, s.Balance, 3, ben, joe)
+	assertBalance(t, s.Balance, 0, bob, joe)
+}
+
+func assertBalance(t *testing.T, m *trianglem.M, expected, from, to int) {
+	val := m.Get(from, to)
+
+	assert.Equal(t, expected, val)
 }

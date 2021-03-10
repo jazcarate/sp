@@ -79,8 +79,8 @@ type Transfer struct {
 }
 
 func (op Transfer) apply(s *State) (*State, error) {
-	_, fromI, errF := s.findParticipant(op.From)
-	_, toI, errT := s.findParticipant(op.To)
+	_, from, errF := s.findParticipant(op.From)
+	_, to, errT := s.findParticipant(op.To)
 
 	if errF != nil {
 		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer from: %w", errF)}
@@ -90,12 +90,45 @@ func (op Transfer) apply(s *State) (*State, error) {
 		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer to: %w", errT)}
 	}
 
-	err := s.Balance.Modify(fromI, toI, func(i int) int { return i - op.Amount })
+	rem := op.Amount
+	// Cancel the direct debt
+	// Start paying other's debts
+
+	for intermediate, debt := range s.Balance.Iterate(to) {
+		debt := debt
+		if debt < 0 && from != intermediate && to != intermediate {
+			val := max(rem, -debt)
+
+			errF = s.Balance.Modify(from, intermediate, func(i int) int { return i - val })
+
+			if errF != nil {
+				return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer change from: %w", errF)}
+			}
+
+			errT = s.Balance.Modify(intermediate, to, func(i int) int { return i - val })
+
+			if errT != nil {
+				return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer change to: %w", errT)}
+			}
+
+			rem -= val
+		}
+	}
+
+	err := s.Balance.Modify(from, to, func(i int) int { return i - rem })
 	if err != nil {
-		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer balance modification: %w", errT)}
+		return nil, &ApplyError{PreviousState: s, Op: op, Err: fmt.Errorf("transfer change remainder: %w", err)}
 	}
 
 	return s, nil
+}
+
+func max(a, b int) int {
+	if a < b {
+		return a
+	}
+
+	return b
 }
 
 // A SigningConfiguration dictates how to verify each operation.
@@ -136,8 +169,9 @@ func (op Spend) apply(s *State) (*State, error) {
 		}
 
 		err = s.Balance.Modify(x, y, func(x int) int { return x - (op.Amount * p1.SplitPercentage / 100) })
+
 		if err != nil {
-			return s, fmt.Errorf("couldn't modify (%d, %d): %w", x, y, err)
+			return nil, &ApplyError{PreviousState: s, Op: op, Err: err}
 		}
 	}
 

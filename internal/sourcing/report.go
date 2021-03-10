@@ -80,20 +80,17 @@ func toTime(t time.Time) string {
 // Markdown converts a state to a markdown report.
 func (s *State) Markdown(wr io.Writer) error {
 	glance := func(x int, y int) string {
-		p, err := s.Balance.Get(x, y)
-		if err != nil {
-			panic(fmt.Sprintf("can't get the participant at (%d, %d)", x, y))
-		}
+		p := s.Balance.Get(x, y)
 
 		if p == 0 {
 			return ""
 		}
 
 		if p < 0 {
-			return fmt.Sprint("$", -p, "◀")
+			return fmt.Sprint("$", -p, "↙")
 		}
 
-		return fmt.Sprint("$", p, "🔼")
+		return fmt.Sprint("$", p, "↗")
 	}
 
 	balanceDetail := func(pIndex int, i int) string {
