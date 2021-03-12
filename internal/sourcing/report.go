@@ -64,12 +64,12 @@ func toOpMarkdown(op StateChanger) string {
 	case Transfer:
 		return fmt.Sprintf("📩 %s transferred $%d to %s", participant(e.From), e.Amount, participant(e.To))
 	case MultiOp:
-		var result string
-		for _, o := range e.Ops {
-			result += toOpMarkdown(o) + "<br />"
+		var result []string = make([]string, len(e.Ops))
+		for i, o := range e.Ops {
+			result[i] = toOpMarkdown(o)
 		}
 
-		return result
+		return strings.Join(result, "<br />")
 	default:
 		panic(fmt.Sprint("Unknown event type", op))
 	}

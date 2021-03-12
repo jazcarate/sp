@@ -11,9 +11,13 @@ import (
 func main() {
 	var s *sourcing.State
 
-	now := time.Now()
-
-	s, err := s.Apply(sourcing.Configure{NewConfig: sourcing.All}, now)
+	s, err := s.Apply(sourcing.MultiOp{
+		Ops: []sourcing.StateChanger{
+			sourcing.AddParticipant{Name: "Joe", PublicKey: "3"},
+			sourcing.AddParticipant{Name: "Bob", PublicKey: "1"},
+			sourcing.Transfer{From: "Joe", To: "Bob", Amount: 300},
+		},
+	}, time.Now())
 	if err != nil {
 		panic(err)
 	}

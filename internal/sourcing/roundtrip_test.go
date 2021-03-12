@@ -64,6 +64,19 @@ func TestRoundtrip_Transfer(t *testing.T) {
 	asserRoundtrip(t, s)
 }
 
+func TestRoundtrip_MultiOp(t *testing.T) {
+	var s *sourcing.State
+	s, _ = s.Apply(sourcing.MultiOp{
+		Ops: []sourcing.StateChanger{
+			sourcing.AddParticipant{Name: "Joe", PublicKey: "3"},
+			sourcing.AddParticipant{Name: "Bob", PublicKey: "1"},
+			sourcing.Transfer{From: "Joe", To: "Bob", Amount: 300},
+		},
+	}, now)
+
+	asserRoundtrip(t, s)
+}
+
 func asserRoundtrip(t *testing.T, s *sourcing.State) {
 	var b bytes.Buffer
 

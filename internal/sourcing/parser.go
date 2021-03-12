@@ -260,7 +260,7 @@ func Parse(r io.Reader) (*State, error) {
 					By:        by,
 					Operation: op,
 					On:        on.Unix(),
-					Note:      vals[4],
+					Note:      strings.ReplaceAll(vals[4], "<br />", "\n"),
 					Signature: signature,
 					Valid:     valid,
 				}
@@ -301,60 +301,87 @@ func removeComment(key, input string) (string, error) {
 }
 
 func parseOperation(input string) (StateChanger, string, string, error) {
+	opLogS := strings.Split(input, " <!-- Sign ")
+	signMeta := strings.Split(opLogS[1], " ")
+
+	by := signMeta[0]
+	signature := signMeta[1]
+
+	opsS := strings.Split(opLogS[0], "<br />")
+
+	var ops []StateChanger = make([]StateChanger, len(opsS))
+
+	for i, op := range opsS {
+		op, err := parseSingleOperation(op)
+		if err != nil {
+			return nil, "", "", err
+		}
+
+		ops[i] = op
+	}
+
+	if len(opsS) == 1 {
+		return ops[0], by, signature, nil
+	}
+
+	return MultiOp{Ops: ops}, by, signature, nil
+}
+
+func parseSingleOperation(input string) (StateChanger, error) {
 	parts := strings.Split(input, " ")
 
 	switch parts[0] {
 	case "➕":
 		name, err := fromAnchor(parts[2])
 		if err != nil {
-			return nil, "", "", errNotAnchor
+			return nil, errNotAnchor
 		}
 
-		return AddParticipant{Name: name, PublicKey: parts[6]}, parts[10], parts[11], nil
+		return AddParticipant{Name: name, PublicKey: parts[6]}, nil
 	case "🪓":
 		name, err := fromAnchor(parts[2])
 		if err != nil {
-			return nil, "", "", errNotAnchor
+			return nil, errNotAnchor
 		}
 
 		split, err := strconv.Atoi(parts[4])
 		if err != nil {
-			return nil, "", "", fmt.Errorf("parsing new split value <%s>: %w", parts[4], err)
+			return nil, fmt.Errorf("parsing new split value <%s>: %w", parts[4], err)
 		}
 
-		return SplitParticipant{Name: name, NewSplit: split}, parts[7], parts[8], nil
+		return SplitParticipant{Name: name, NewSplit: split}, nil
 	case "💻":
-		return Configure{NewConfig: parts[3]}, parts[6], parts[7], nil
+		return Configure{NewConfig: parts[3]}, nil
 	case "💸":
 		name, err := fromAnchor(parts[1])
 		if err != nil {
-			return nil, "", "", errNotAnchor
+			return nil, errNotAnchor
 		}
 
 		amount, err := strconv.Atoi(parts[3][1:])
 		if err != nil {
-			return nil, "", "", fmt.Errorf("parsing $ amount value <%s>: %w", parts[4], err)
+			return nil, fmt.Errorf("parsing $ amount value <%s>: %w", parts[4], err)
 		}
 
-		return Spend{Who: name, Amount: amount}, parts[6], parts[7], nil
+		return Spend{Who: name, Amount: amount}, nil
 	case "📩":
 		from, err := fromAnchor(parts[1])
 		if err != nil {
-			return nil, "", "", errNotAnchor
+			return nil, errNotAnchor
 		}
 
 		to, err := fromAnchor(parts[5])
 		if err != nil {
-			return nil, "", "", errNotAnchor
+			return nil, errNotAnchor
 		}
 
 		amount, err := strconv.Atoi(parts[3][1:])
 		if err != nil {
-			return nil, "", "", fmt.Errorf("parsing $ amount value <%s>: %w", parts[3], err)
+			return nil, fmt.Errorf("parsing $ amount value <%s>: %w", parts[3], err)
 		}
 
-		return Transfer{From: from, To: to, Amount: amount}, parts[8], parts[9], nil
+		return Transfer{From: from, To: to, Amount: amount}, nil
 	}
 
-	return nil, "", "", errNotRecognized
+	return nil, errNotRecognized
 }
