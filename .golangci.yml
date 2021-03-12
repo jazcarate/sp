@@ -70,7 +70,6 @@ linters:
     - sqlclosecheck
     - stylecheck
     - unconvert
-    - unparam
     - whitespace
     - wsl
     - exhaustivestruct
@@ -78,6 +77,7 @@ linters:
     - tparallel
     - wrapcheck
     # don't enable:
+    # - unparam
     # - go-header
     # - testpackage
     # - gomnd

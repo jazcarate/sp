@@ -17,9 +17,10 @@ type Participant struct {
 
 // A LogEvent represents an event in the log.
 type LogEvent struct {
+	ID        int
 	By        string
 	Operation StateChanger
-	On        time.Time
+	On        int64
 	Note      string
 	Signature string
 	Valid     bool
@@ -43,26 +44,27 @@ func NewState() *State {
 		Participants:  nil,
 		Configuration: Trust,
 		Log:           nil,
-		LastOp:        -1,
+		LastOp:        0,
 		Balance:       nil,
 	}
 }
 
 // Apply an operation to a state.
-func (s *State) Apply(op StateChanger) (*State, error) {
+func (s *State) Apply(op StateChanger, now time.Time) (*State, error) {
 	if s == nil {
 		s = NewState()
 	}
 
+	s.LastOp++
 	s.Log = append(s.Log, LogEvent{
+		ID:        s.LastOp,
 		Operation: op,
-		On:        time.Now(),
+		On:        now.Unix(),
 		Note:      "",
 		Signature: "1",
 		By:        "joaco",
 		Valid:     true,
 	})
-	s.LastOp++
 
 	return op.apply(s)
 }

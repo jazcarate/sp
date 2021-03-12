@@ -18,19 +18,19 @@
 
 ## Details
 ### Joaco
-<!-- Public key: 1nrNwqN/3ssdTwJU4b8LKml1dBwhf2lV49AF2Vqf1Y9Uhnwy5+zF0DfDC0B8ZvSy3eDN+wLu5IUYHZY+XLBbvZJvUWl6VLznp6g3P3thlnF0LAe//lHrY0opuLSa+vIfi8gTBTtG9w1cdPyzhzjUCVHMqAH82I9+NywekJJI3w3IbO3pdvGm5uuKBoapj2LxDgzNqnPdQH8dTmeKmxfXsoAJLF1x9+UUSEhsZv03hWBwDq8jW1NlhzUWYeGKDP7Z3YtV1j0cTWyVZKws4FOfohahVDE9pPPI4fMkW6NJD2JzL4ZeCmgrSdxqWCLGIpZq95oMTtMXqkKuTetG+KkmqQ== -->
+<!-- Public key 1nrNwqN/3ssdTwJU4b8LKml1dBwhf2lV49AF2Vqf1Y9Uhnwy5+zF0DfDC0B8ZvSy3eDN+wLu5IUYHZY+XLBbvZJvUWl6VLznp6g3P3thlnF0LAe//lHrY0opuLSa+vIfi8gTBTtG9w1cdPyzhzjUCVHMqAH82I9+NywekJJI3w3IbO3pdvGm5uuKBoapj2LxDgzNqnPdQH8dTmeKmxfXsoAJLF1x9+UUSEhsZv03hWBwDq8jW1NlhzUWYeGKDP7Z3YtV1j0cTWyVZKws4FOfohahVDE9pPPI4fMkW6NJD2JzL4ZeCmgrSdxqWCLGIpZq95oMTtMXqkKuTetG+KkmqQ== -->
 You currently split the expenditures at **50%**.
 - You **owe $5** to [Greenderella](#greenderella)
 - You are **owed $7** from [Bob](#bob)
 
 ### Greenderella
-<!-- Public key: 6P8mIpUnW+9kN4Gm9tccCHfTo9VGR8jxOTMBpk0qHwrLdwXR6aYVJssHS00yrPTk1h9sJpCGuMiGQTHhrIxT4UasFvw2GW4CLzS+n/vmyzAsrn58jzub8VN/DJ/PhmfdNK5Y+ty2veSRD+ShMhP3k9DL5gc9tAHgextiUaFp8retVCFepZKCJR0b3iuO98+RBvVbAh765qLzX5tP2Klcm8vAKdq1RZe3butVSrxGo9j0UqJGpoA4xdoEpsXIxnKl9hy4cswDU5qZo+z7GJjz1G78EXMxCDzU7iy0+xXNg5e3n2wfhpbb0prBR13lvqKYhwg5ESBPC8R9bH8rJ7v9Lw== -->
+<!-- Public key 6P8mIpUnW+9kN4Gm9tccCHfTo9VGR8jxOTMBpk0qHwrLdwXR6aYVJssHS00yrPTk1h9sJpCGuMiGQTHhrIxT4UasFvw2GW4CLzS+n/vmyzAsrn58jzub8VN/DJ/PhmfdNK5Y+ty2veSRD+ShMhP3k9DL5gc9tAHgextiUaFp8retVCFepZKCJR0b3iuO98+RBvVbAh765qLzX5tP2Klcm8vAKdq1RZe3butVSrxGo9j0UqJGpoA4xdoEpsXIxnKl9hy4cswDU5qZo+z7GJjz1G78EXMxCDzU7iy0+xXNg5e3n2wfhpbb0prBR13lvqKYhwg5ESBPC8R9bH8rJ7v9Lw== -->
 You currently split the expenditures at **50%**.
 - You are **owed $5** from [Joaco](#joaco)
 - You are **owed $10** from [Bob](#bob)
 
 ### Bob
-<!-- Public key: 6no8Rv4VaEn9NEDmETm49qOdFawwVZU+i9H/IGkuGv6Gn3+0bYMsKyxo00eCOvNikmiXUojvR0/O2Gh6/OXc4H1+/CAiNEpNM67PsRtlYZ5gQUxIWsD0bA64Jr/bJcZX2gHKZXtGT0ezkpLUVxZ1UpZkvngDyfV4ouF4t9u4J0+nkXREEqGKDkxd9cKj2u9aCnoEveYd2iKvYtAFiuBcyLFeJJaORmznrh0Qh9SgGeM8vrd39GSkZIqOw1YPQN93uWdB6CuIucFKDjrRsv8CGFZ5GRTPyyqR/PmO2l75ZQwdyahIjtFWZzDy6lFZispclxX84uEXqVhlGrVmcBSb/Q== -->
+<!-- Public key 6no8Rv4VaEn9NEDmETm49qOdFawwVZU+i9H/IGkuGv6Gn3+0bYMsKyxo00eCOvNikmiXUojvR0/O2Gh6/OXc4H1+/CAiNEpNM67PsRtlYZ5gQUxIWsD0bA64Jr/bJcZX2gHKZXtGT0ezkpLUVxZ1UpZkvngDyfV4ouF4t9u4J0+nkXREEqGKDkxd9cKj2u9aCnoEveYd2iKvYtAFiuBcyLFeJJaORmznrh0Qh9SgGeM8vrd39GSkZIqOw1YPQN93uWdB6CuIucFKDjrRsv8CGFZ5GRTPyyqR/PmO2l75ZQwdyahIjtFWZzDy6lFZispclxX84uEXqVhlGrVmcBSb/Q== -->
 You currently split the expenditures at **0%**.
 - You **owe $10** to [Greenderella](#greenderella)
 - You **owe $7** to [Joaco](#joaco)
