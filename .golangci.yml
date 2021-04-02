@@ -40,13 +40,13 @@ linters:
     - dogsled
     - dupl
     - exportloopref
-    - funlen
+    # - funlen
     - gochecknoglobals
     - gochecknoinits
-    - gocognit
+    # - gocognit
     - goconst
     - gocritic
-    - gocyclo
+    # - gocyclo
     - godot
     - godox
     - goerr113

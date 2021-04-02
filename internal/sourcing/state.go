@@ -2,6 +2,7 @@
 package sourcing
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/jazcarate/sp/internal/trianglem"
@@ -66,7 +67,12 @@ func (s *State) Apply(op StateChanger, now time.Time) (*State, error) {
 		Valid:     true,
 	})
 
-	return op.apply(s)
+	s, err := op.apply(s)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't apply state: %w", err)
+	}
+
+	return s, nil
 }
 
 func (s *State) findParticipant(name string) (*Participant, int, error) {

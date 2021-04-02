@@ -31,7 +31,7 @@ func TestParticipant_EnablingAnUnexistingErrors(t *testing.T) {
 
 	if assert.Error(t, err) {
 		assert.Equal(t,
-			"apply <sourcing.SplitParticipant{Name:\"Joe\", NewSplit:3}>: that participant does not exist",
+			"couldn't apply state: apply <sourcing.SplitParticipant{Name:\"Joe\", NewSplit:3}>: that participant does not exist",
 			err.Error())
 	}
 }
@@ -46,7 +46,7 @@ func TestParticipantError_AddingDuplicateParticipantsErrors(t *testing.T) {
 
 	if assert.Error(t, err) {
 		assert.Equal(t,
-			"couldn't apply operation #1: apply <sourcing.AddParticipant{Name:\"Joe\", PublicKey:\"2\"}>: participant already exists",
+			"couldn't apply state: couldn't apply operation #1: apply <sourcing.AddParticipant{Name:\"Joe\", PublicKey:\"2\"}>: participant already exists",
 			err.Error())
 	}
 }
@@ -69,7 +69,7 @@ func TestTransfer_ErrorWhenParticipantDoesNotExistTo(t *testing.T) {
 
 	if assert.Error(t, err) {
 		assert.Equal(t,
-			"apply <sourcing.Transfer{From:\"Joe\", To:\"Ben\", Amount:10}>: transfer to: that participant does not exist",
+			"couldn't apply state: apply <sourcing.Transfer{From:\"Joe\", To:\"Ben\", Amount:10}>: transfer to: that participant does not exist",
 			err.Error())
 	}
 }
@@ -81,7 +81,7 @@ func TestTransfer_ErrorWhenParticipantDoesNotExistFrom(t *testing.T) {
 
 	if assert.Error(t, err) {
 		assert.Equal(t,
-			"apply <sourcing.Transfer{From:\"Joe\", To:\"Ben\", Amount:10}>: transfer from: that participant does not exist",
+			"couldn't apply state: apply <sourcing.Transfer{From:\"Joe\", To:\"Ben\", Amount:10}>: transfer from: that participant does not exist",
 			err.Error())
 	}
 }
